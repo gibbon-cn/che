@@ -37,3 +37,33 @@ If you are interested in fixing issues and contributing directly to the code bas
 
 ### License
 Che is open sourced under the Eclipse Public License 1.0.
+
+## 源码阅读
+
+主要模块
+```xml
+    <modules>
+        <module>core</module>
+        <module>wsmaster</module>
+        <module>wsagent</module>
+        <module>multiuser</module>
+        <module>ide</module>
+        <module>agents</module>
+        <module>infrastructures</module>
+        <module>plugins</module>
+        <module>ide/che-ide-core</module>
+        <module>ide/che-ide-full</module>
+        <module>ide/che-ide-gwt-app</module>
+        <module>dashboard</module>
+        <module>workspace-loader</module>
+        <module>assembly</module>
+        <module>selenium</module>
+    </modules>
+```        
+
+
+Workspace REST API
+D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceService.java
+
+Workspace Manager
+D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceManager.java
