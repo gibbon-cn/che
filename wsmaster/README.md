@@ -235,4 +235,3 @@ DockerInternalRuntime.bootstrapInstallers
 
 源码阅读
 D:\USR\uGit\che-src\infrastructures\docker\infrastructure\README.md
-
