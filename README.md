@@ -67,3 +67,6 @@ D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\ch
 
 Workspace Manager
 D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceManager.java
+
+源代码阅读之工作空间主控（Workspace Master）
+D:\USR\uGit\che-src\wsmaster\README.md
