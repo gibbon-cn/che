@@ -58,6 +58,10 @@ init_initial_images() {
   # get list of images
   get_image_manifest ${CHE_VERSION}
 
+  # jip
+  echo "查看当前镜像列表"
+  docker images
+
   # grab all bootstrap images
   IFS=$'\n'
   for BOOTSTRAP_IMAGE_LINE in ${BOOTSTRAP_IMAGE_LIST}; do
@@ -188,10 +192,11 @@ is_native() {
   fi
 }
 
-
+# 执行docker命令
 docker_run() {
 #  debug $FUNCNAME
   # Setup options for connecting to docker host
+  # 设定链接docker主机地选项
   if [ -z "${DOCKER_HOST+x}" ]; then
       DOCKER_HOST="/var/run/docker.sock"
   fi

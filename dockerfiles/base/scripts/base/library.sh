@@ -241,16 +241,21 @@ wait_until_container_is_running() {
   done
 }
 
+# 检查是否包含docker-compose程序
 has_compose() {
   hash docker-compose 2>/dev/null && return 0 || return 1
 }
 
+# docker编排
+# CHE_HOST_INSTANCE CHE主机实例
+# CHE_CONTAINER_INSTANCE CHE容器实例
 docker_compose() {
 #  debug $FUNCNAME
-
+  # 如果由docker-compose命令，则由docker-compose执行
   if has_compose; then
     docker-compose "$@"
   else
+    # -> D:\USR\uGit\che-src\dockerfiles\base\scripts\base\startup_03_pre_networking.sh
     docker_run -v "${CHE_HOST_INSTANCE}":"${CHE_CONTAINER_INSTANCE}" \
                   $IMAGE_COMPOSE "$@"
   fi

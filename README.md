@@ -41,6 +41,7 @@ Che is open sourced under the Eclipse Public License 1.0.
 ## 源码阅读
 
 主要模块
+
 ```xml
     <modules>
         <module>core</module>

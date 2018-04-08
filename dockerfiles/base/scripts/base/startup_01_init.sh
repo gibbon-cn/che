@@ -252,18 +252,23 @@ start() {
   pre_init
 
   # Yo, constants
+  # 初始化常量
   init_constants
 
   # Variables used throughout
+  # 初始化全局变量
   init_global_vars
 
   # Check to make sure CLI assembly matches base
+  # 保证CLI程序集与base相匹配
   init_cli_version_check
 
   # Checks for global parameters
+  # 检查全局参数
   init_usage_check "$@"
 
   # Removes global parameters from the positional arguments
+  # 从位置参数中去除全局参数
   ORIGINAL_PARAMETERS=$@
   set -- "${@/\-\-fast/}"
   set -- "${@/\-\-debug/}"
@@ -278,78 +283,125 @@ start() {
   source "${CHE_BASE_SCRIPTS_CONTAINER_SOURCE_DIR}"/startup_02_pre_docker.sh
 
   # Make sure Docker is working and we have /var/run/docker.sock mounted or valid DOCKER_HOST
+  # 确保Docker在工作，以及/var/run/docker.sock已经加载，或者DOCKER_HOST有效（使用hash命令）
+  # 最终获取CHE_VERSION变量，例如 6.3.0或latest等
   init_check_docker "$@"
 
   # Check to see if Docker is configured with a proxy and pull values
+  # 确保Docker配置有代理，根据 docker info 输出变量http_proxy/https_proxy/no_proxy
   init_check_docker_networking
 
   # Verify that -i is passed on the command line
+  # 确认-i在命令行中，根据 -t 1 和 docker inspect来判断
   init_check_interactive "$@"
 
   # Only verify mounts after Docker is confirmed to be working.
+  # 确认挂载点
   init_check_mounts "$@"
 
   # Extract the value of --user from the docker command line
+  # 提取由docker命令行传入的--user值，通过docker inspect命令
   init_check_user "$@"
 
   # Extract the value of --group-add from the docker command line
+  # 提取由docker命令行传入的group-add参数
   init_check_groups "$@"
 
   # Only initialize after mounts have been established so we can write cli.log out to a mount folder
+  # 在挂载建立后进行初始化，以便将cli.log输出到挂载的目录；/data/cli.log
   init_logging "$@"
 
   # Determine where the remaining scripts will be sourced from (inside image, or repo?)
+  # 确定剩下的脚本从哪里获取，实在镜像内，还是仓库？
+  # ${CHE_LOCAL_REPO} 本地仓库设置，检查方法是根据挂载的/data目录下的repo目录相关信息（？）
+  # skip_script参数
+  # SCRIPTS_BASE_CONTAINER_SOURCE_DIR = /repo/dockerfiles/base/scripts/base
+  # 或者...
   init_scripts "$@"
 
   # We now know enough to load scripts from different locations - so source from proper source
+  # 加载脚本
   source "${SCRIPTS_BASE_CONTAINER_SOURCE_DIR}"/startup_03_pre_networking.sh
 
   # If offline mode, then load dependent images from disk and populate the local Docker cache.
+  # 如果是离线模式，则从磁盘加载独立的镜像，然后发布到本地的Docker缓存中
+  # 检查CHE_OFFLINE参数，即offline全局参数；同时，容器存储地址为/data/backup，使用docker load加载容器
   # If not in offline mode, verify that we have access to DockerHub.
+  # 如果不是离线模式，而且没有执行is_fast和skip_network选项，则确保能够访问DockerHub，否则失败；
+    # 略过网络 --skip:network
   # This is also the first usage of curl
+  # 第一次使用curl
   init_offline_or_network_mode "$@"
 
   # Pull the list of images that are necessary. If in offline mode, verifies that the images
+  # 在必要时拉取镜像，如果是离线模式，则确保镜像已经加载到缓存
   # are properly loaded into the cache.
+    # 此处代码没有对offline模式进行判断，直接使用docker images -q进行判断，如果不存在，则执行docker pull拉取镜像
+    # 问题点
   init_initial_images "$@"
 
   # Each CLI assembly must provide this cli.sh - loads overridden functions and variables for the CLI
-  source "${SCRIPTS_CONTAINER_SOURCE_DIR}"/post_init.sh
+  # 每个CLI程序集必须提供此cli.sh脚本，用于加载重载的方法和CLI变量
+  # D:\USR\uGit\che-src\dockerfiles\cli\scripts\post_init.sh   
+  source "${SCRIPTS_CONTAINER_SOURCE_DIR}"/post_init.shpost_init.sh
 
   # The post_init method is unique to each assembly. This method must be provided by 
   # a custom CLI assembly in their container and can set global variables which are 
   # specific to that implementation of the CLI. Place initialization functions that
   # require networking here.
+  # post_init对每一个程序集都是唯一的。每个定制的CLI程序集在容器中都要提供该方法，并且能够设置对CLI实现特定的全局变量。
+  # 放置需要网络的初始化函数。
+  # 通过BOOTSTRAP_IMAGE_CHEIP容器来获取Docker主机的IP，推测为che-ip（？）
   post_init
 
   # Begin product-specific CLI calls
+  # 开始与产品相关的CLI调用
   info "cli" "$CHE_VERSION - using docker ${DOCKER_SERVER_VERSION} / $(get_docker_install_type)"
 
+  # D:\USR\uGit\che-src\dockerfiles\base\scripts\base\startup_04_pre_cli_init.sh
   source "${SCRIPTS_BASE_CONTAINER_SOURCE_DIR}"/startup_04_pre_cli_init.sh
 
   # Allow CLI assemblies to load variables assuming networking, logging, docker activated  
+  # 允许CLI程序集加载命令，用以假定网络、日志、激活的docker
   cli_pre_init
 
   # Set CHE_HOST, CHE_PORT, and apply any CLI-specific command-line overrides to variables  
+  # 设定 CHE_HOST, CHE_PORT, 并应用任意CLI特定的命令行来重写变量
   cli_init "$@"
 
   # Additional checks for nightly version
+  # 对于nightly版本增加额外的检查，通过jq解析 docker inspect结果获取变量值
   cli_verify_nightly "$@"
 
   # Additional checks to verify image matches version installed on disk & upgrade suitability
+  # 确保镜像与在磁盘上安装的一直，并适当地升级
+    # upgrade标识 -> 升级
+    # 未指定fast，检查版本
   cli_verify_version "$@"
 
   # Allow CLI assemblies to load variables assuming CLI is finished bootstrapping
+  # 假定CLI以及完成启动，允许CLI程序集加载变量
   cli_post_init
 
+  # D:\USR\uGit\che-src\dockerfiles\base\scripts\base\startup_05_pre_exec.sh
   source "${SCRIPTS_BASE_CONTAINER_SOURCE_DIR}"/startup_05_pre_exec.sh
 
   # Loads the library and associated dependencies
+  # 加载类库和依赖项 D:\USR\uGit\che-src\dockerfiles\base\scripts\base\library.sh
   cli_load "$@"
 
   # Parses the command list for validity
+  # 解析命令列表用于验证
+  # 例如start COMMAND = cmd_start
   cli_parse "$@"
 
   # Executes command lifecycle
+  # 执行命令生命周期，以start为例
+  # 加载脚本 D:\USR\uGit\che-src\dockerfiles\base\scripts\base\commands\cmd_start.sh
+  # 检查输入参数，如果有误，输出帮助 help_cmd_start
+  # 执行函数，并检查执行结果
+    # pre_cmd_start
+    # cmd_start
+    # post_cmd_start
   cli_execute "$@"
 }

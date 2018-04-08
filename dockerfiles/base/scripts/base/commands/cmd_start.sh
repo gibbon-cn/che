@@ -26,6 +26,7 @@ help_cmd_start() {
   text "\n"  
 }
 
+# 启动命令前导，解析参数
 pre_cmd_start() {
   CHE_SKIP_CONFIG=false
   CHE_SKIP_PREFLIGHT=false
@@ -66,11 +67,13 @@ post_cmd_start() {
   :
 }
 
-
+# 启动命令
 cmd_start() {
   # If already running, just display output again
+  # 如果已经启动了，则仅仅再次展示输出
   check_if_booted
 
+  # 如果服务端已经启动，则返回1
   if server_is_booted $(get_server_container_id $CHE_CONTAINER_NAME); then 
     return 1
   fi
@@ -94,10 +97,13 @@ cmd_start() {
 
   # Start ${CHE_FORMAL_PRODUCT_NAME}
   # Note bug in docker requires relative path, not absolute path to compose file
+  # 启动容器
   info "start" "Starting containers..."
   COMPOSE_UP_COMMAND="docker_compose --file=\"${REFERENCE_CONTAINER_COMPOSE_FILE}\" -p=\"${CHE_COMPOSE_PROJECT_NAME}\" up -d"
 
   ## validate the compose file (quiet mode)
+  # 校验编排文件
+  # -> D:\USR\uGit\che-src\dockerfiles\base\scripts\base\library.sh
   if local_repo; then
     docker_compose --file=${REFERENCE_CONTAINER_COMPOSE_FILE} config -q || (error "Invalid docker compose file content at ${REFERENCE_CONTAINER_COMPOSE_FILE}" && return 2)
   fi
@@ -107,19 +113,27 @@ cmd_start() {
   fi
 
   log ${COMPOSE_UP_COMMAND}
+  # 执行编排文件
+  echo '执行编排文件'
+  echo ${COMPOSE_UP_COMMAND}
+  # docker_compose --file="/data/instance/docker-compose-container.yml" -p="che" up -d >> "/data/cli.log" 2>&1
   eval ${COMPOSE_UP_COMMAND} || (error "Error during 'compose up' - printing 30 line tail of ${CHE_HOST_CONFIG}/cli.log:" && tail -30 ${LOGS} && return 2)
 
+  # 等待，直到启动完毕
   wait_until_booted
 
+  # 超时检查
   if ! server_is_booted $(get_server_container_id $CHE_CONTAINER_NAME); then 
     error "(${CHE_MINI_PRODUCT_NAME} start): Timeout waiting for server. Run \"docker logs ${CHE_CONTAINER_NAME}\" to inspect."
     return 2
   fi
 
+  # postflight检查
   if ! is_fast && ! skip_postflight; then
     cmd_start_check_postflight
   fi
 
+  # 检查是否已经启动
   check_if_booted
 }
 

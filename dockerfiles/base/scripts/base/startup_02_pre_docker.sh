@@ -590,6 +590,7 @@ init_scripts() {
     fi
 
     # Compare scripts inside of the Docker image with those on the repository
+    # 将Docker镜像内的脚本与仓库的脚本进行比对，如果不同，则失败
     # Fail if they do not match
     DIFF_NUM=$(diff -r "/scripts/base" "${SCRIPTS_BASE_CONTAINER_SOURCE_DIR}" | wc -l)
     if [ $DIFF_NUM -gt 0 ]; then 
