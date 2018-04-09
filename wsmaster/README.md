@@ -1,0 +1,237 @@
+# wsmaster
+
+工作空间Master，依赖于Core
+
+## 入口
+
+Workspace REST API
+D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceService.java
+
+Workspace Manager
+D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceManager.java
+
+## 工作空间的创建
+WorkspaceManager.createWorkspace
+WorkspaceManager.doCreateWorkspace
+WorkspaceDao.create
+    D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\spi\WorkspaceDao.java    
+    WorkspaceDao接口的实现类
+            D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\jpa\JpaWorkspaceDao.java
+            D:\USR\uGit\che-src\multiuser\permission\che-multiuser-permission-workspace\src\main\java\org\eclipse\che\multiuser\permission\workspace\server\spi\jpa\MultiuserJpaWorkspaceDao.java
+JpaWorkspaceDao.create
+    JpaWorkspaceDao操作：
+        create
+        update
+        remove
+        get
+        getWorkspaces
+        
+JpaWorkspaceDao.doCreate
+EntityManager.persisit
+   
+
+## 工作空间的启动
+
+工作空间的启动
+
+WorkspaceManager.startWorkspace
+    1. workspaceDao.get
+    2. startAsync
+        workspaceDao.update
+        runtimes.startAsync
+    3. normalizeState
+
+主流程
+WorkspaceManager.startWorkspace
+WorkspaceRuntimes.startAsync
+    D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\WorkspaceRuntimes.java
+    1. InternalRuntime runtime = runtimeContext.getRuntime();
+    2. publishWorkspaceStatusEvent
+    3. CompletableFuture.runAsync
+    
+主流程
+WorkspaceRuntimes.startAsync
+CompletableFuture.runAsync(new StartRuntimeTask(workspace, options, runtime))
+    
+StartRuntimeTask.run
+InternalRuntime.start(options);  
+    D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\spi\InternalRuntime.java
+    InternalRuntime结构
+        WorkspaceStatus
+InternalRuntime.internalStart
+
+InternalRuntime的两个实现
+    D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\DockerInternalRuntime.java
+    D:\USR\uGit\che-src\infrastructures\kubernetes\src\main\java\org\eclipse\che\workspace\infrastructure\kubernetes\KubernetesInternalRuntime.java
+
+DockerInternalRuntime.internalStart
+    1. 创建网络 networks.createNetwork(getContext().getEnvironment().getNetwork());
+    2. 创建/准备镜像 imagesBuilderFactory
+    3. 对于每一个容器入口
+        获取机器名 machineName
+        向运行时放置机器
+        启动机器，获得DockerMachine
+        启动installer
+
+主流程        
+DockerInternalRuntime.startMachine
+    DockerMachineStarter.startContainer -> DockerMachine
+        D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\DockerMachineStarter.java
+    1. DockerMachineStarter.createContainer
+        DockerConnector.createContainer
+            D:\USR\uGit\che-src\infrastructures\docker\docker-client\src\main\java\org\eclipse\che\infrastructure\docker\client\DockerConnector.java
+        DockerConnection.request(POST, /container/create, )
+    2. DockerMachineCreator.create
+        D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\DockerMachineCreator.java
+        DockerMachine()
+DockerInternalRuntime.bootstrapInstallers
+    1. 从机器配置获得installer 
+    2. DockerBootstrapperFactory.create -> DockerBootstrapper
+        D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\bootstrap\DockerBootstrapperFactory.java
+    3. DockerBootstrapper.bootstrap
+        D:\USR\uGit\che-src\wsmaster\che-core-api-workspace\src\main\java\org\eclipse\che\api\workspace\server\bootstrap\AbstractBootstrapper.java
+        D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\bootstrap\DockerBootstrapper.java
+        DockerBootstrapper.doBootstrapAsync
+        DockerBootstrapper.injectBootstrapper
+            DockerMachine.putResource(BOOTSTRAPPER_BASE_DIR)
+            DockerMachine.putResource(BOOTSTRAPPER_DIR)
+        DockerMachine.exec
+    
+  
+```
+    dockerMachine.exec(
+        BOOTSTRAPPER_DIR
+            + BOOTSTRAPPER_FILE
+            + " -machine-name "
+            + machineName
+            + " -runtime-id "
+            + String.format(
+                "%s:%s:%s:%s",
+                runtimeIdentity.getWorkspaceId(),
+                runtimeIdentity.getEnvName(),
+                runtimeIdentity.getOwnerName(),
+                runtimeIdentity.getOwnerId())
+            + " -push-endpoint "
+            + installerWebsocketEndpoint
+            + " -push-logs-endpoint "
+            + outputWebsocketEndpoint
+            + " -enable-auth"
+            + " -server-check-period "
+            + serverCheckPeriodSeconds
+            + " -installer-timeout "
+            + installerTimeoutSeconds
+            + " -file "
+            + BOOTSTRAPPER_DIR
+            + CONFIG_FILE,
+        null);
+```
+
+### DockerMachine
+
+D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\DockerMachine.java
+
+接口Machine
+D:\USR\uGit\che-src\core\che-core-api-model\src\main\java\org\eclipse\che\api\core\model\workspace\runtime\Machine.java
+
+是对机器运行时信息描述
+
+构造函数引用
+
+D:\USR\uGit\che-src\infrastructures\docker\infrastructure\src\main\java\org\eclipse\che\workspace\infrastructure\docker\DockerMachineCreator.java
+
+```java
+  /** Creates new docker machine instance from the full container description. */
+  public DockerMachine create(ContainerInfo container) throws InfrastructureException {
+    NetworkSettings networkSettings = container.getNetworkSettings();
+    String hostname;
+    if (internalDockerIP != null) {
+      hostname = internalDockerIP;
+    } else {
+      hostname = networkSettings.getGateway();
+    }
+    Deserializer deserializer = Labels.newDeserializer(container.getConfig().getLabels());
+    Map<String, ServerConfig> configs = deserializer.servers();
+
+    return new DockerMachine(
+        container.getId(),
+        container.getConfig().getImage(),
+        docker,
+        new ServersMapper(hostname, deserializer.machineName())
+            .map(networkSettings.getPorts(), configs),
+        registry,
+        dockerMachineStopDetector,
+        MachineStatus.RUNNING,
+        deserializer.machineAttributes());
+  }
+  ```
+
+构造函数
+
+```java
+  public DockerMachine(
+      String containerId,
+      String image,
+      DockerConnector docker,
+      Map<String, ServerImpl> servers,
+      String registry,
+      DockerMachineStopDetector dockerMachineStopDetector,
+      MachineStatus status,
+      Map<String, String> attributes) {
+    this.container = containerId;
+    this.docker = docker;
+    this.image = image;
+    this.registry = registry;
+    this.dockerMachineStopDetector = dockerMachineStopDetector;
+    if (servers != null) {
+      this.servers = ImmutableMap.copyOf(servers);
+    } else {
+      this.servers = Collections.emptyMap();
+    }
+    if (attributes != null) {
+      this.attributes = ImmutableMap.copyOf(attributes);
+    } else {
+      this.attributes = Collections.emptyMap();
+    }
+    this.status = status;
+  }
+```  
+
+## 深入DockerConnector
+
+DockerConnector
+
+DockerConnection
+
+DockerConnettion的两个实现
+    TcpConnection 使用http协议
+        D:\USR\uGit\che-src\infrastructures\docker\docker-client\src\main\java\org\eclipse\che\infrastructure\docker\client\connection\TcpConnection.java
+    UnixSocketConnection 使用文件流，也是HTTP协议
+        D:\USR\uGit\che-src\infrastructures\docker\docker-client\src\main\java\org\eclipse\che\infrastructure\docker\client\connection\UnixSocketConnection.java
+
+## Installer周期
+
+```json
+// 工作空间配置文件（部分）
+    "dev-machine": {
+        "attributes": {
+        "memoryLimitBytes": "2147483648"
+        },
+        "servers": {},
+        "agents": [
+        "org.eclipse.che.ls.csharp",
+        "org.eclipse.che.git-credentials",
+        "org.eclipse.che.ssh",
+        "org.eclipse.che.ws-agent",
+        "org.eclipse.che.terminal",
+        "org.eclipse.che.exec"
+        ]
+    }
+```
+
+
+
+从这里开始        
+DockerInternalRuntime.bootstrapInstallers
+
+源码阅读
+D:\USR\uGit\che-src\infrastructures\docker\infrastructure\README.md
