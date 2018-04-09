@@ -40,5 +40,6 @@
         <module>ls-yaml</module>
         <module>ls-camel</module>
         <module>ls-clang</module>
+        <module>curl</module>
     </modules>
 </project>

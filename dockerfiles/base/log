@@ -1,0 +1,71 @@
+[1mBuilding Docker Image eclipse/che-base:nightly from /home/jip/uGit/che-src/dockerfiles/base directory with tag nightly[0m
+Sending build context to Docker daemon  20.73MB
+Step 1/9 : FROM alpine:3.4
+ ---> c7fc7faf8c28
+Step 2/9 : ENV DOCKER_BUCKET get.docker.com
+ ---> Using cache
+ ---> 3be52929f691
+Step 3/9 : ENV DOCKER_VERSION 1.11.2
+ ---> Using cache
+ ---> 5e029a9a3be0
+Step 4/9 : ENV DOCKER_SHA256 8c2e0c35e3cda11706f54b2d46c2521a6e9026a7b13c7d4b8ae1f3a706fc55e1
+ ---> Using cache
+ ---> 53284271adef
+Step 5/9 : COPY docker.tgz docker.tgz
+ ---> Using cache
+ ---> 04c286243afe
+Step 6/9 : RUN mkdir -p /version     && mkdir -p /cli     && mkdir /scripts/     && apk add --no-cache ca-certificates coreutils curl openssl jq     && apk add --update bash     && rm -rf /var/cache/apk/*     && set -x     && echo "${DOCKER_SHA256} *docker.tgz" | sha256sum -c -     && tar -xzvf docker.tgz     && mv docker/docker /usr/local/bin/     && rm -rf docker     && rm docker.tgz     && docker -v
+ ---> Running in f13570a760e7
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.4/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.4/community/x86_64/APKINDEX.tar.gz
+(1/9) Installing ca-certificates (20161130-r0)
+(2/9) Installing libattr (2.4.47-r4)
+(3/9) Installing libacl (2.2.52-r2)
+(4/9) Installing coreutils (8.25-r0)
+(5/9) Installing libssh2 (1.7.0-r0)
+(6/9) Installing libcurl (7.59.0-r0)
+(7/9) Installing curl (7.59.0-r0)
+(8/9) Installing jq (1.5-r1)
+(9/9) Installing openssl (1.0.2n-r0)
+Executing busybox-1.24.2-r14.trigger
+Executing ca-certificates-20161130-r0.trigger
+OK: 12 MiB in 20 packages
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.4/main/x86_64/APKINDEX.tar.gz
+fetch http://dl-cdn.alpinelinux.org/alpine/v3.4/community/x86_64/APKINDEX.tar.gz
+(1/5) Installing ncurses-terminfo-base (6.0_p20171125-r0)
+(2/5) Installing ncurses-terminfo (6.0_p20171125-r0)
+(3/5) Installing ncurses-libs (6.0_p20171125-r0)
+(4/5) Installing readline (6.3.008-r4)
+(5/5) Installing bash (4.3.42-r5)
+Executing bash-4.3.42-r5.post-install
+Executing busybox-1.24.2-r14.trigger
+OK: 21 MiB in 25 packages
+[91m+ echo 8c2e0c35e3cda11706f54b2d46c2521a6e9026a7b13c7d4b8ae1f3a706fc55e1 *docker.tgz
++ sha256sum -c -
+[0mdocker.tgz: OK
+[91m+ tar -xzvf docker.tgz
+[0mdocker/
+docker/docker
+docker/docker-containerd-shim
+docker/docker-containerd
+docker/docker-containerd-ctr
+docker/docker-runc
+[91m+ mv docker/docker /usr/local/bin/
+[0m[91m+ rm -rf docker
+[0m[91m+ rm docker.tgz
+[0m[91m+ docker -v
+[0mDocker version 1.11.2, build b9f10c9
+Removing intermediate container f13570a760e7
+ ---> f793431ab268
+Step 7/9 : COPY scripts/base /scripts/base/
+ ---> 2a50c6a67922
+Step 8/9 : COPY scripts/entrypoint.sh /scripts/entrypoint.sh
+ ---> 0d2f3d23b7f9
+Step 9/9 : RUN chmod u+x /scripts/entrypoint.sh
+ ---> Running in 2540cf43d0e1
+Removing intermediate container 2540cf43d0e1
+ ---> c1177c529b39
+Successfully built c1177c529b39
+Successfully tagged eclipse/che-base:nightly
+Build of [1;34meclipse/che-base:nightly [0;32m[OK][0m
+[0;32mScript run successfully: [1;34meclipse/che-base:nightly[0m

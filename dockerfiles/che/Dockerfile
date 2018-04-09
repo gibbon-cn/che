@@ -26,9 +26,11 @@ ENV LANG=C.UTF-8 \
     DOCKER_BUCKET=get.docker.com \
     CHE_IN_CONTAINER=true
 
+COPY docker-1.6.0 /usr/bin/docker
+
 RUN echo "http://dl-4.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories && \
     apk add --update curl openssl sudo bash && \
-    curl -sSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-${DOCKER_VERSION}" -o /usr/bin/docker && \
+    # curl -sSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-${DOCKER_VERSION}" -o /usr/bin/docker && \
     chmod +x /usr/bin/docker && \
     echo "%root ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     rm -rf /tmp/* /var/cache/apk/*

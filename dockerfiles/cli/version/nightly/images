@@ -1,5 +1,5 @@
 IMAGE_INIT=eclipse/che-init:nightly
-IMAGE_CHE=eclipse/che-server:nightly
+IMAGE_CHE=localhost:5000/eclipse/che-server:nightly
 IMAGE_COMPOSE=docker/compose:1.10.1
 IMAGE_TRAEFIK=traefik:v1.5.0
 IMAGE_POSTGRES=centos/postgresql-96-centos7:9.6

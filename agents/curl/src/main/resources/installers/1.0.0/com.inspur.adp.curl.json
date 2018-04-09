@@ -1,0 +1,9 @@
+{
+  "id": "com.inspur.adp.curl",
+  "version": "1.0.0",
+  "name": "Curl",
+  "description": "Embedded Curl",
+  "dependencies": [],
+  "properties": {},
+  "servers": {}
+}

@@ -382,6 +382,10 @@
             <artifactId>testng</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+	    <groupId>org.eclipse.che</groupId>
+	    <artifactId>curl-agent</artifactId>
+        </dependency>
     </dependencies>
     <build>
         <resources>
