@@ -385,6 +385,7 @@
         <dependency>
 	    <groupId>org.eclipse.che</groupId>
 	    <artifactId>curl-agent</artifactId>
+	    <version>6.3.0</version>	
         </dependency>
     </dependencies>
     <build>
