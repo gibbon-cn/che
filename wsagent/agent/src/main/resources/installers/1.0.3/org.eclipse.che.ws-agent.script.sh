@@ -59,11 +59,14 @@ MACHINE_TYPE=$(uname -m)
 
 mkdir -p ${CHE_DIR}
 
+# 将projects文件夹的用户改为当前用户
 if is_current_user_sudoer; then
+    # 防止projects未初始
     ${SUDO} mkdir -p /projects
     ${SUDO} sh -c "chown -R $(id -u -n) /projects"
 fi
 
+# 判断是否需要安装JDK
 INSTALL_JDK=false
 command -v ${JAVA_HOME}/bin/java >/dev/null 2>&1 || {
     INSTALL_JDK=true;
@@ -242,6 +245,7 @@ else
     exit 1
 fi
 
+# 安装工作空间代理
 ########################
 ### Install ws-agent ###
 ########################

@@ -47,7 +47,7 @@ public class InstallersProvider implements Provider<Set<Installer>> {
 
     try {
       Enumeration<URL> installerResources =
-          Thread.currentThread().getContextClassLoader().getResources("/installers");
+          Thread.currentThread().getContextClassLoader().getResources("/installers");      
       while (installerResources.hasMoreElements()) {
         URL installerResource = installerResources.nextElement();
 
