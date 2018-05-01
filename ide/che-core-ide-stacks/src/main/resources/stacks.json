@@ -2957,5 +2957,87 @@
         }
       ]
     }
+  },
+  {
+    "name": "GSP Server",
+    "id": "stackogo85yjq77a7z6j7",
+    "creator": "GSP",
+    "scope": "general",
+    "description": "ASP.NET 2.0 With GSP Server",
+    "tags": [
+      "asp.net",
+      "Git",
+      "GSP"
+    ],
+    "workspaceConfig": {
+      "name": "wksp-y8ja",
+      "commands": [
+        {
+          "name": "update dependencies",
+          "type": "custom",
+          "attributes": {
+            "goal": "Build",
+            "previewUrl": ""
+          },
+          "commandLine": "cd ${current.project.path} && dotnet restore"
+        },
+        {
+          "name": "run",
+          "type": "custom",
+          "attributes": {
+            "goal": "Run",
+            "previewUrl": "${server.dot.net.server}"
+          },
+          "commandLine": "cd ${current.project.path} && dotnet run"
+        }
+      ],
+      "environments": {
+        "default": {
+          "recipe": {
+            "type": "dockerimage",
+            "content": "localhost:5000/gsp/dotnet_plus_jdk"
+          },
+          "machines": {
+            "dev-machine": {
+              "attributes": {
+                "memoryLimitBytes": "2147483648"
+              },
+              "servers": {
+                "dot.net.server": {
+                  "attributes": {},
+                  "protocol": "http",
+                  "port": "5010"
+                }
+              },
+              "env": {},
+              "volumes": {},
+              "installers": [
+                "org.eclipse.che.exec",
+                "org.eclipse.che.terminal",
+                "org.eclipse.che.ws-agent",
+                "com.inspur.gsp.wsagent"
+              ]
+            }
+          }
+        }
+      },
+      "defaultEnv": "default",
+      "projects": [],
+      "links": []
+    },
+    "components": [
+      {
+        "name": "Debian",
+        "version": "7"
+      },
+      {
+        "name": "ASP.NET Core",
+        "version": "2.0.0"
+      },
+      {
+        "name": "GSP Server",
+        "version": "1.0.0"
+      }
+    ]
   }
 ]
