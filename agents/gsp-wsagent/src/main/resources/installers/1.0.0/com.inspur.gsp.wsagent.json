@@ -1,0 +1,15 @@
+{
+  "id": "com.inspur.gsp.wsagent",
+  "version": "1.0.0",
+  "name": "gsp-wsagent",
+  "description": "GSP Workspace Agent (dotnetcore2)",
+  "dependencies": [],
+  "properties": {},
+  "servers": {
+    // "gsp-wsagent/http": {
+    //  "port": "5010/tcp",
+    //  "protocol": "http",
+    //  "path" : "/api/runtime/clouddev/v1.0"
+    // }
+   }
+}

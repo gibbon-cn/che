@@ -162,7 +162,9 @@ func tryConn(server Server) error {
 	}
 	port := split[0]
 	addr := "127.0.0.1:" + port
+	fmt.Println(addr)
 	conn, err := net.Dial(protocol, addr)
+	fmt.Println(err)
 	if err != nil {
 		return fmt.Errorf("Failed establish connection to "+addr, err)
 	}

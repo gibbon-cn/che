@@ -28,6 +28,8 @@ import org.eclipse.che.api.installer.shared.dto.InstallerDto;
 import org.eclipse.che.api.installer.shared.model.Installer;
 import org.eclipse.che.commons.lang.IoUtil;
 import org.eclipse.che.dto.server.DtoFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Scans resources to create {@link Installer} based upon them. To be able to find appropriate
@@ -40,7 +42,7 @@ import org.eclipse.che.dto.server.DtoFactory;
  * @author Anatolii Bazko
  */
 public class InstallersProvider implements Provider<Set<Installer>> {
-
+  private static final Logger LOG = LoggerFactory.getLogger(InstallersProvider.class);
   @Override
   public Set<Installer> get() {
     Set<Installer> installers = new HashSet<>();
@@ -50,7 +52,9 @@ public class InstallersProvider implements Provider<Set<Installer>> {
           Thread.currentThread().getContextClassLoader().getResources("/installers");
       while (installerResources.hasMoreElements()) {
         URL installerResource = installerResources.nextElement();
-
+        // add by jip
+        String installerPath = installerResource.toURI().toString();
+        LOG.info("Installer Resource: " + installerPath);
         IoUtil.listResources(
             installerResource.toURI(),
             versionDir -> {
@@ -64,6 +68,7 @@ public class InstallersProvider implements Provider<Set<Installer>> {
                 script.ifPresent(
                     path -> {
                       Installer installer = init(descriptor, script.get());
+                      LOG.info("Add Installer: " + installerPath);
                       installers.add(installer);
                     });
               }
@@ -76,6 +81,7 @@ public class InstallersProvider implements Provider<Set<Installer>> {
     return installers;
   }
 
+  // 从路径寻找installer的描述
   private List<Path> findInstallersDescriptors(Path dir) {
     try {
       return Files.find(dir, 1, (path, basicFileAttributes) -> path.toString().endsWith(".json"))

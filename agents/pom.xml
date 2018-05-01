@@ -41,5 +41,6 @@
         <module>ls-camel</module>
         <module>ls-clang</module>
         <module>curl</module>
+        <module>gsp-wsagent</module>
     </modules>
 </project>
