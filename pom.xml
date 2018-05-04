@@ -174,6 +174,11 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>
+                <artifactId>curl-agent</artifactId>
+                <version>${che.version}</version>
+            </dependency>            
+            <dependency>
+                <groupId>org.eclipse.che</groupId>
                 <artifactId>exec-agent</artifactId>
                 <version>${che.version}</version>
             </dependency>
@@ -191,6 +196,11 @@
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>
+                <artifactId>gsp-wsagent</artifactId>
+                <version>${che.version}</version>
+            </dependency>            
+            <dependency>
+                <groupId>org.eclipse.che</groupId>
                 <artifactId>ls-camel-agent</artifactId>
                 <version>${che.version}</version>
             </dependency>
@@ -202,7 +212,7 @@
             <dependency>
                 <groupId>org.eclipse.che</groupId>
                 <artifactId>ls-csharp-agent</artifactId>
-                <version>${che.version}</version>
+            ${che.version}    <version>${che.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.eclipse.che</groupId>
@@ -254,6 +264,11 @@
             <dependency>
                 <groupId>org.eclipse.che</groupId>
                 <artifactId>unison-agent</artifactId>
+                <version>${che.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.eclipse.che</groupId>
+                <artifactId>vi-agent</artifactId>
                 <version>${che.version}</version>
             </dependency>
             <dependency>
